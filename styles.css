@@ -1,0 +1,6 @@
+.hide {
+    visibility: hidden;
+    color: red;
+    font-weight: bold;
+    font-size: 13px;
+}
