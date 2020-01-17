@@ -11,16 +11,17 @@
 
 var personController = (function() {
 
-    var Person = function(name, password, surname) {
+    var Person = function(name, password, surname, username) {
         this.name = name;
         this.password = password;
         this.surname = surname;
+        this.username = username;
     };
 
     var data = [];
 
-    var addData = function(name, password, surname) {
-        var person = new Person(name, password, surname);
+    var addData = function(name, password, surname, username) {
+        var person = new Person(name, password, surname, username);
 
         console.log("========after push==========");
 
@@ -74,7 +75,9 @@ var uiController = (function() {
         bdayInput: "#bdayInput",
         saveButton: "#saveButton",
         nameInput_error: "#nameInput-error",
-        passwordInput_error: "#passwordInput-error"
+        passwordInput_error: "#passwordInput-error",
+        surNameInput_error: "#surNameInput-error",
+        userNameInput_error: "#userNameInput-error"
     };
 
     var formData = function() {
@@ -82,6 +85,7 @@ var uiController = (function() {
             password: document.querySelector(formStrings.passwordInput).value,
             name: document.querySelector(formStrings.nameInput).value,
             surname: document.querySelector(formStrings.surNameInput).value,
+            username: document.querySelector(formStrings.userNameInput).value,
         }
 
     }
@@ -121,30 +125,46 @@ var appController = (function(ui) {
         document.querySelector("#delete").addEventListener('click', function() {
             personController.deleteItem("asd1");
         });
-
+        // after click on submit button
         document.querySelector(ui.getFormStrings().saveButton).addEventListener('click', function() {
+            // get data from inputs
             var data = ui.getFormData();
             let error = false;
-            // console.log("click on save button", ui.getFormData());
-            if (!data.name || data.name === "asd") {
+
+            if (!data.name || data.name.length <= 3) {
                 ui.getShowErrorMessage(ui.getFormStrings().nameInput_error);
                 error = true
             } else {
                 ui.getHideErrorMessage(ui.getFormStrings().nameInput_error);
             }
 
-            if (!data.password || data.password.length === 3) {
+            if (!data.password || data.password.length <= 3) {
                 ui.getShowErrorMessage(ui.getFormStrings().passwordInput_error);
                 error = true;
             } else {
                 ui.getHideErrorMessage(ui.getFormStrings().passwordInput_error);
             }
-            if (!error) {
-                personController.addData(data.name, data.password, data.surname);
+
+
+            if (!data.surname || data.surname.length <= 3) {
+                ui.getShowErrorMessage(ui.getFormStrings().surNameInput_error);
+                error = true;
+            } else {
+                ui.getHideErrorMessage(ui.getFormStrings().surNameInput_error);
             }
 
-            console.log(document.querySelector("#radioMale").checked);
-            console.log(document.querySelector("#radioMale").value);
+            if (!data.username || data.username.length <= 3) {
+                ui.getShowErrorMessage(ui.getFormStrings().userNameInput_error);
+                error = true;
+            } else {
+                ui.getHideErrorMessage(ui.getFormStrings().userNameInput_error);
+            }
+
+            if (error == false) {
+                personController.addData(data.name, data.password, data.surname, data.username);
+            }
+            // console.log(document.querySelector("#radioMale").checked);
+            // console.log(document.querySelector("#radioMale").value);
 
         });
     }
