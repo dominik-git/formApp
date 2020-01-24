@@ -9,13 +9,21 @@
 //     }
 // },
 
-var personController = (function() {
+const personController = (function() {
+
+
+
+    function getId() {
+        let id = data.length;
+        return id;
+    }
 
     var Person = function(name, password, surname, username) {
         this.name = name;
         this.password = password;
         this.surname = surname;
         this.username = username;
+        this.id = getId();
     };
 
     var data = [];
@@ -26,11 +34,14 @@ var personController = (function() {
         console.log("========after push==========");
 
         data.push(person);
+
         data.forEach(function(entry) {
             console.log(entry);
         });
-    };
 
+        return person;
+    };
+    // {pes, modra} {macka, cervena}
     var deleteItem = function(id) {
         let index;
         for (let i = 0; i < data.length; i++) {
@@ -62,10 +73,10 @@ var personController = (function() {
 
 })();
 
-var uiController = (function() {
+const uiController = (function() {
     console.log("ui controller init");
 
-    var formStrings = {
+    let formStrings = {
         nameInput: "#nameInput",
         surNameInput: "#surnameInput",
         userNameInput: "#usernameInput",
@@ -77,10 +88,11 @@ var uiController = (function() {
         nameInput_error: "#nameInput-error",
         passwordInput_error: "#passwordInput-error",
         surNameInput_error: "#surNameInput-error",
-        userNameInput_error: "#userNameInput-error"
+        userNameInput_error: "#userNameInput-error",
+        user_table: "#user_table"
     };
 
-    var formData = function() {
+    let formData = function() {
         return {
             password: document.querySelector(formStrings.passwordInput).value,
             name: document.querySelector(formStrings.nameInput).value,
@@ -89,14 +101,36 @@ var uiController = (function() {
         }
 
     }
-    var hideErrorMessage = function(errorSpan) {
+
+    let clearFields = function() {
+        document.querySelector(formStrings.passwordInput).value = "";
+        document.querySelector(formStrings.nameInput).value = "";
+        document.querySelector(formStrings.surNameInput).value = "";
+        document.querySelector(formStrings.userNameInput).value = "";
+
+    }
+
+    let hideErrorMessage = function(errorSpan) {
         document.querySelector(errorSpan).style.visibility = 'hidden';
     }
-    var showErrorMessage = function(errorSpan) {
+    let showErrorMessage = function(errorSpan) {
         console.log(errorSpan, "error");
         document.querySelector(errorSpan).style.visibility = 'visible';
         document.querySelector(errorSpan).style.color = 'red';
 
+    }
+    let addPersonRow = function(obj) {
+        const table = document.querySelector(formStrings.user_table).getElementsByTagName("tbody")[0];
+        const row = table.insertRow(0);
+        const cell1 = row.insertCell(0);
+        cell1.className = "test";
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+        const cell4 = row.insertCell(3);
+        cell1.innerHTML = obj.name;
+        cell2.innerHTML = obj.surname;
+        cell3.innerHTML = obj.password;
+        cell4.innerHTML = obj.username;
     }
 
     return {
@@ -111,14 +145,16 @@ var uiController = (function() {
         },
         getShowErrorMessage: function(input) {
             return showErrorMessage(input);
-        }
+        },
+        addPersonRow,
+        clearFields
 
     }
 
 
 })()
 
-var appController = (function(ui) {
+const appController = (function(ui) {
     console.log("class app controller");
 
     var registerListeners = function() {
@@ -161,8 +197,12 @@ var appController = (function(ui) {
             }
 
             if (error == false) {
-                personController.addData(data.name, data.password, data.surname, data.username);
+                const personData = personController.addData(data.name, data.password, data.surname, data.username);
+                ui.addPersonRow(personData);
+                ui.clearFields();
+
             }
+
             // console.log(document.querySelector("#radioMale").checked);
             // console.log(document.querySelector("#radioMale").value);
 
