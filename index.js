@@ -9,6 +9,13 @@
 //     }
 // },
 
+//add button
+// const btn = document.createElement('input');
+// btn.type = "button";
+// btn.className = "btn delete-button";
+// btn.value = obj.id;
+// cell5.appendChild(btn);
+
 const personController = (function() {
 
 
@@ -45,7 +52,7 @@ const personController = (function() {
     var deleteItem = function(id) {
         let index;
         for (let i = 0; i < data.length; i++) {
-            if (data[i].name == id) {
+            if (data[i].id == id) {
                 index = i;
                 break;
             }
@@ -92,6 +99,12 @@ const uiController = (function() {
         user_table: "#user_table"
     };
 
+    let removeElement = function(elementId) {
+        // Removes an element from the document
+        var element = document.getElementById(elementId);
+        element.parentNode.removeChild(element);
+    }
+
     let formData = function() {
         return {
             password: document.querySelector(formStrings.passwordInput).value,
@@ -122,16 +135,26 @@ const uiController = (function() {
     let addPersonRow = function(obj) {
         const table = document.querySelector(formStrings.user_table).getElementsByTagName("tbody")[0];
         const row = table.insertRow(0);
+        row.id = "user" + obj.id;
         const cell1 = row.insertCell(0);
         cell1.className = "test";
         const cell2 = row.insertCell(1);
         const cell3 = row.insertCell(2);
         const cell4 = row.insertCell(3);
+        const cell5 = row.insertCell(4);
         cell1.innerHTML = obj.name;
         cell2.innerHTML = obj.surname;
         cell3.innerHTML = obj.password;
         cell4.innerHTML = obj.username;
-    }
+        const btn = document.createElement('input');
+        btn.type = "button";
+        btn.className = "btn delete-button";
+        btn.value = "Delete";
+        btn.id = obj.id;
+
+        cell5.appendChild(btn);
+
+    };
 
     return {
         getFormData: function() {
@@ -146,6 +169,7 @@ const uiController = (function() {
         getShowErrorMessage: function(input) {
             return showErrorMessage(input);
         },
+        removeElement,
         addPersonRow,
         clearFields
 
@@ -154,13 +178,10 @@ const uiController = (function() {
 
 })()
 
-const appController = (function(ui) {
+const appController = (function(ui, pc) {
     console.log("class app controller");
 
-    var registerListeners = function() {
-        document.querySelector("#delete").addEventListener('click', function() {
-            personController.deleteItem("asd1");
-        });
+    const registerListeners = function() {
         // after click on submit button
         document.querySelector(ui.getFormStrings().saveButton).addEventListener('click', function() {
             // get data from inputs
@@ -197,9 +218,9 @@ const appController = (function(ui) {
             }
 
             if (error == false) {
-                const personData = personController.addData(data.name, data.password, data.surname, data.username);
+                const personData = pc.addData(data.name, data.password, data.surname, data.username);
                 ui.addPersonRow(personData);
-                ui.clearFields();
+                //ui.clearFields();
 
             }
 
@@ -207,17 +228,35 @@ const appController = (function(ui) {
             // console.log(document.querySelector("#radioMale").value);
 
         });
+        document.querySelector(ui.getFormStrings().user_table).addEventListener('click', deleteItem);
+
+    };
+    let deleteItem = function(event) {
+        console.log("type", event.target.type);
+        console.log("class", event.target.classList.contains("delete-button"));
+        console.log("asad", event.target.value);
+        console.log("id", event.target.id);
+
+        if (event.target.type == 'button' && event.target.classList.contains("delete-button")) {
+            const id = event.target.id;
+            pc.deleteItem(id);
+            const userId = "user" + id;
+            ui.removeElement(userId);
+        }
     }
 
 
-    var init = function() {
+
+
+
+    const init = function() {
         registerListeners();
-    }
+    };
 
     return {
         init
     }
 
-})(uiController)
+})(uiController, personController)
 
 appController.init();
